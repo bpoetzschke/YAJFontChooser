@@ -142,6 +142,7 @@ public class YAJFontChooser extends JDialog
 		m_FontFamilyList = new JList<String>();
 		m_FontFamilyList.setBorder(null);
 		m_FontFamilyList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		m_FontFamilyList.addListSelectionListener(m_SelectionListener);
 		m_FontFamilyScrollPane.setViewportView(m_FontFamilyList);
 		
 		m_FontStyleLabel = new JLabel("Style");
@@ -161,6 +162,9 @@ public class YAJFontChooser extends JDialog
 		m_FontSelectionPanel.add(m_FontStyleScrollPane);
 		
 		m_FontStyleList = new JList<FontStyleSelection>();
+		m_FontStyleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		m_FontStyleList.setBorder(null);
+		m_FontStyleList.addListSelectionListener(m_SelectionListener);
 		m_FontStyleScrollPane.setViewportView(m_FontStyleList);
 		
 		m_PreviewPanel = new JPanel();
@@ -172,7 +176,6 @@ public class YAJFontChooser extends JDialog
 		m_PreviewLabel = new JLabel("");
 		m_PreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		m_PreviewPanel.add(m_PreviewLabel);
-		m_FontFamilyList.addListSelectionListener(m_SelectionListener);
 	}
 	
 	private void initFonts()
@@ -219,7 +222,6 @@ public class YAJFontChooser extends JDialog
 		
 		for(Font font : familyFonts)
 		{
-			String fontName = font.getFontName();
 			familyListModel.addElement(new FontStyleSelection(font));
 		}
 		
@@ -248,7 +250,16 @@ public class YAJFontChooser extends JDialog
 			}
 			else if(_Event.getSource().equals(m_FontStyleList))
 			{
+				FontStyleSelection styleSelection = m_FontStyleList.getSelectedValue();
+				if(styleSelection != null)
+				{
+					m_FontStyleTextField.setText(styleSelection.toString());
+					m_FontStyleTextField.setCaretPosition(0);
 				
+					m_PreviewLabel.setText(styleSelection.toString());
+					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), 10);
+					m_PreviewLabel.setFont(font);
+				}
 			}
 		}
 	}
@@ -276,6 +287,11 @@ public class YAJFontChooser extends JDialog
 		public String toString()
 		{
 			return m_Selection.getFamily();
+		}
+		
+		public Font getSelection()
+		{
+			return m_Selection;
 		}
 		
 		private Font m_Selection = null;
