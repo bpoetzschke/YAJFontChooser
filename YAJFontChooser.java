@@ -27,6 +27,8 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +43,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.border.TitledBorder;
 
 public class YAJFontChooser extends JDialog
 {
@@ -87,6 +89,7 @@ public class YAJFontChooser extends JDialog
 	private int							m_SelectedFontSize		= 10;
 	private ComponentActionListener		m_ActionListener		= new ComponentActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
+	private KeyHandler					m_KeyListener			= new KeyHandler();
 	
 	private static int[] 				DEFAULT_FONT_SIZES		= {5,6,7,8,9,10,11,12,13,14,18,24,36,48,64,72,96};
 	
@@ -116,6 +119,10 @@ public class YAJFontChooser extends JDialog
 		setLocationRelativeTo(null);
 		
 		setTitle("Select Font");
+		
+		//setFocusable required to be set to true to repsond to key listener
+		setFocusable(true);
+		addKeyListener(m_KeyListener);
 		
 		m_ButtonPanel = new JPanel();
 		getContentPane().add(m_ButtonPanel, BorderLayout.SOUTH);
@@ -280,6 +287,12 @@ public class YAJFontChooser extends JDialog
 		return m_SelectedFont;
 	}
 	
+	private void loadFont(String _FontName, int _FontStyle, int _FontSize)
+	{
+		m_SelectedFont = new Font(_FontName, _FontStyle, _FontSize);
+		m_PreviewLabel.setFont(m_SelectedFont);
+	}
+	
 	//----------------------------------------------------------------------------
 	// Internal classes
 	//----------------------------------------------------------------------------
@@ -304,12 +317,9 @@ public class YAJFontChooser extends JDialog
 					m_FontStyleTextField.setText(styleSelection.toString());
 					m_FontStyleTextField.setCaretPosition(0);
 				
+					loadFont(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
+					
 					m_PreviewLabel.setText(styleSelection.toString());
-					
-					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
-					m_PreviewLabel.setFont(font);
-					
-					m_SelectedFont = font;
 				}
 			}
 			else if(_Event.getSource().equals(m_FontSizeList))
@@ -323,11 +333,7 @@ public class YAJFontChooser extends JDialog
 						m_FontSizeTextField.setCaretPosition(m_FontSizeTextField.getText().length());
 						m_SelectedFontSize = m_FontSizeList.getSelectedValue().intValue();
 						
-						Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
-						
-						m_PreviewLabel.setFont(font);
-						
-						m_SelectedFont = font;
+						loadFont(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
 					}
 				}
 			}
@@ -350,6 +356,8 @@ public class YAJFontChooser extends JDialog
 			}
 			else if(_Event.getSource().equals(m_FontSizeTextField))
 			{
+				requestFocus();
+				
 				int fontSize = Integer.parseInt(m_FontSizeTextField.getText());
 				
 				if(fontSize <= 0)
@@ -383,11 +391,7 @@ public class YAJFontChooser extends JDialog
 						FontStyleSelection styleSelection = m_FontStyleList.getSelectedValue();
 						if(styleSelection != null)
 						{
-							Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
-							
-							m_PreviewLabel.setFont(font);
-							
-							m_SelectedFont = font;
+							loadFont(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
 						}
 					}
 				}
@@ -458,5 +462,29 @@ public class YAJFontChooser extends JDialog
 		}
 		
 		private Font m_Selection = null;
+	}
+	
+	private class KeyHandler implements KeyListener
+	{
+		@Override
+		public void keyTyped(KeyEvent _Event)
+		{	
+		}
+
+		@Override
+		public void keyPressed(KeyEvent _Event)
+		{
+			if(_Event.getKeyCode() == KeyEvent.VK_ESCAPE)
+			{
+				m_SelectedFont = null;
+				setVisible(false);
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent _Event)
+		{
+		}
+		
 	}
 }
