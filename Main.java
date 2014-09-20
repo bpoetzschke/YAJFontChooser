@@ -1,3 +1,5 @@
+import java.awt.Font;
+
 
 public class Main
 {
@@ -5,8 +7,8 @@ public class Main
 	{
 		// TODO Auto-generated method stub
 		
-		YAJFontChooser.showDialog();
+		Font fon = YAJFontChooser.showDialog();
 		
-		System.out.println("Dialog closed");
+		System.out.println("Selected font:" + fon);
 	}
 }

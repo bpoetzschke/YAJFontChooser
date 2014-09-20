@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 Björn Pötzschke<bjoern.poetzschke@gmail.com>
+ * Copyright (c) 2014 Bjoern Poetzschke<bjoern.poetzschke@gmail.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,8 +80,14 @@ public class YAJFontChooser extends JDialog
 	private JList<FontStyleSelection>	m_FontStyleList			= null;
 	private JPanel 						m_PreviewPanel			= null;
 	private JLabel 						m_PreviewLabel			= null;
+	private JLabel						m_FontSizeLabel			= null;
+	private JTextField					m_FontSizeTextField		= null;
+	private JScrollPane					m_FontSizeScrollPane	= null;
+	private JList<Integer>				m_FontSizeList			= null;
 	private ButtonActionListener		m_ActionListener		= new ButtonActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
+	
+	private static int[] 				DEFAULT_FONT_SIZES		= {5,6,7,8,9,10,11,12,13,14,18,24,36,48,64,72,96};
 	
 	private YAJFontChooser(Font _PreselectedFont)
 	{
@@ -93,6 +99,7 @@ public class YAJFontChooser extends JDialog
 		setModal(true);
 		
 		initFonts();
+		initFontSizeList();
 		
 		if(_PreselectedFont != null)
 		{
@@ -112,13 +119,13 @@ public class YAJFontChooser extends JDialog
 		m_ButtonPanel = new JPanel();
 		getContentPane().add(m_ButtonPanel, BorderLayout.SOUTH);
 		
-		m_CancelButton = new JButton("Cancel");
-		m_CancelButton.addActionListener(m_ActionListener);
-		m_ButtonPanel.add(m_CancelButton);
-		
 		m_OkButton = new JButton("OK");
 		m_OkButton.addActionListener(m_ActionListener);
 		m_ButtonPanel.add(m_OkButton);
+		
+		m_CancelButton = new JButton("Cancel");
+		m_ButtonPanel.add(m_CancelButton);
+		m_CancelButton.addActionListener(m_ActionListener);
 		
 		m_FontSelectionPanel = new JPanel();
 		getContentPane().add(m_FontSelectionPanel, BorderLayout.CENTER);
@@ -169,6 +176,15 @@ public class YAJFontChooser extends JDialog
 		m_FontStyleList.addListSelectionListener(m_SelectionListener);
 		m_FontStyleScrollPane.setViewportView(m_FontStyleList);
 		
+		m_FontSizeLabel = new JLabel("Size");
+		m_FontSizeLabel.setBounds(349, 6, 61, 16);
+		m_FontSelectionPanel.add(m_FontSizeLabel);
+		
+		m_FontSizeTextField = new JTextField();
+		m_FontSizeTextField.setBounds(345, 24, 138, 20);
+		m_FontSelectionPanel.add(m_FontSizeTextField);
+		m_FontSizeTextField.setColumns(10);
+		
 		m_PreviewPanel = new JPanel();
 		m_PreviewPanel.setBorder(new TitledBorder(null, "Preview", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		m_PreviewPanel.setBounds(6, 235, 488, 98);
@@ -178,6 +194,16 @@ public class YAJFontChooser extends JDialog
 		m_PreviewLabel = new JLabel("");
 		m_PreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		m_PreviewPanel.add(m_PreviewLabel);
+		
+		m_FontSizeScrollPane = new JScrollPane();
+		m_FontSizeScrollPane.setBounds(349, 51, 130, 175);
+		m_FontSelectionPanel.add(m_FontSizeScrollPane);
+		
+		m_FontSizeList = new JList<Integer>();
+		m_FontSizeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		m_FontSizeList.setBorder(null);
+		m_FontSizeList.addListSelectionListener(m_SelectionListener);
+		m_FontSizeScrollPane.setViewportView(m_FontSizeList);
 	}
 	
 	private void initFonts()
@@ -214,6 +240,21 @@ public class YAJFontChooser extends JDialog
 		}
 		
 		m_FontFamilyList.setModel(fontFamilyListModel);
+		
+		m_FontFamilyList.setSelectedIndex(0);
+	}
+	
+	private void initFontSizeList()
+	{
+		DefaultListModel<Integer> sizeListModel = new DefaultListModel<Integer>();
+		
+		for(int sizeIndex = 0; sizeIndex < DEFAULT_FONT_SIZES.length; sizeIndex++)
+		{
+			sizeListModel.addElement(new Integer(DEFAULT_FONT_SIZES[sizeIndex]));
+		}
+		
+		m_FontSizeList.setModel(sizeListModel);
+		m_FontSizeList.setSelectedIndex(7);
 	}
 	
 	private void loadFontsForFamily(String _FontFamily)
@@ -236,6 +277,8 @@ public class YAJFontChooser extends JDialog
 		return m_SelectedFont;
 	}
 	
+	//----------------------------------------------------------------------------
+	// Internal classes
 	//----------------------------------------------------------------------------
 	
 	private class SelectionListener implements ListSelectionListener
@@ -261,6 +304,23 @@ public class YAJFontChooser extends JDialog
 					m_PreviewLabel.setText(styleSelection.toString());
 					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), 10);
 					m_PreviewLabel.setFont(font);
+					
+					m_SelectedFont = font;
+				}
+			}
+			else if(_Event.getSource().equals(m_FontSizeList))
+			{
+				FontStyleSelection styleSelection = m_FontStyleList.getSelectedValue();
+				if(styleSelection != null)
+				{
+					m_FontSizeTextField.setText(m_FontSizeList.getSelectedValue().toString());
+					m_FontSizeTextField.setCaretPosition(m_FontSizeTextField.getText().length());
+					
+					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_FontSizeList.getSelectedValue().intValue());
+					
+					m_PreviewLabel.setFont(font);
+					
+					m_SelectedFont = font;
 				}
 			}
 		}
@@ -271,7 +331,12 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public void actionPerformed(ActionEvent _Event)
 		{
-			if(_Event.getSource().equals(m_CancelButton) || _Event.getSource().equals(m_OkButton))
+			if(_Event.getSource().equals(m_CancelButton))
+			{
+				setVisible(false);
+				m_SelectedFont = null;
+			}
+			else if(_Event.getSource().equals(m_OkButton))
 			{
 				setVisible(false);
 			}
@@ -291,6 +356,7 @@ public class YAJFontChooser extends JDialog
 			String[] fontNameParts = m_Selection.getFontName().split("-");
 			if(fontNameParts.length == 2)
 			{
+				//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
 				String[] parts = fontNameParts[1].split("(?<=\\p{Ll})(?=\\p{Lu})");
 				String fontText = "";
 				
