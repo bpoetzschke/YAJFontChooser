@@ -43,6 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.border.TitledBorder;
 
 public class YAJFontChooser extends JDialog
 {
@@ -76,7 +77,9 @@ public class YAJFontChooser extends JDialog
 	private JLabel						m_FontStyleLabel		= null;
 	private JTextField					m_FontStyleTextField	= null;
 	private JScrollPane 				m_FontStyleScrollPane	= null;
-	private JList<String>				m_FontStyleList			= null;
+	private JList<FontStyleSelection>	m_FontStyleList			= null;
+	private JPanel 						m_PreviewPanel			= null;
+	private JLabel 						m_PreviewLabel			= null;
 	private ButtonActionListener		m_ActionListener		= new ButtonActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
 	
@@ -157,8 +160,18 @@ public class YAJFontChooser extends JDialog
 		m_FontStyleScrollPane.setBorder(null);
 		m_FontSelectionPanel.add(m_FontStyleScrollPane);
 		
-		m_FontStyleList = new JList<String>();
+		m_FontStyleList = new JList<FontStyleSelection>();
 		m_FontStyleScrollPane.setViewportView(m_FontStyleList);
+		
+		m_PreviewPanel = new JPanel();
+		m_PreviewPanel.setBorder(new TitledBorder(null, "Preview", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		m_PreviewPanel.setBounds(6, 235, 438, 98);
+		m_FontSelectionPanel.add(m_PreviewPanel);
+		m_PreviewPanel.setLayout(new BorderLayout(0, 0));
+		
+		m_PreviewLabel = new JLabel("");
+		m_PreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		m_PreviewPanel.add(m_PreviewLabel);
 		m_FontFamilyList.addListSelectionListener(m_SelectionListener);
 	}
 	
@@ -200,14 +213,14 @@ public class YAJFontChooser extends JDialog
 	
 	private void loadFontsForFamily(String _FontFamily)
 	{
-		DefaultListModel<String> familyListModel = new DefaultListModel<String>();
+		DefaultListModel<FontStyleSelection> familyListModel = new DefaultListModel<FontStyleSelection>();
 		
 		List<Font> familyFonts = m_FontMap.get(_FontFamily);
 		
 		for(Font font : familyFonts)
 		{
 			String fontName = font.getFontName();
-			familyListModel.addElement(fontName);
+			familyListModel.addElement(new FontStyleSelection(font));
 		}
 		
 		m_FontStyleList.setModel(familyListModel);
@@ -233,6 +246,10 @@ public class YAJFontChooser extends JDialog
 				
 				loadFontsForFamily(m_FontFamilyTextField.getText());
 			}
+			else if(_Event.getSource().equals(m_FontStyleList))
+			{
+				
+			}
 		}
 	}
 	
@@ -246,5 +263,21 @@ public class YAJFontChooser extends JDialog
 				setVisible(false);
 			}
 		}
+	}
+	
+	private class FontStyleSelection
+	{
+		public FontStyleSelection(Font _Font)
+		{
+			m_Selection = _Font;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return m_Selection.getFamily();
+		}
+		
+		private Font m_Selection = null;
 	}
 }
