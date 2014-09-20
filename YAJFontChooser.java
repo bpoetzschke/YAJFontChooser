@@ -423,7 +423,10 @@ public class YAJFontChooser extends JDialog
 			{
 				toSplit = fontNameParts[1];
 			}
-
+			
+			//remove MT from font style name
+			toSplit = toSplit.replace("MT", "");
+			
 			//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
 			String[] parts = toSplit.split("(?<=\\p{Ll})(?=\\p{Lu})");
 			String fontText = "";
