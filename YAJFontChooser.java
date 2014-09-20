@@ -102,10 +102,12 @@ public class YAJFontChooser extends JDialog
 	
 	private void initUI()
 	{
-		setSize(450,400);
+		setSize(500,400);
 		setPreferredSize(getSize());
 		setResizable(false);
 		setLocationRelativeTo(null);
+		
+		setTitle("Select Font");
 		
 		m_ButtonPanel = new JPanel();
 		getContentPane().add(m_ButtonPanel, BorderLayout.SOUTH);
@@ -130,13 +132,13 @@ public class YAJFontChooser extends JDialog
 		m_FontFamilyTextField.setEditable(false);
 		m_FontFamilyTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		m_FontFamilyTextField.setEnabled(false);
-		m_FontFamilyTextField.setBounds(2, 24, 173, 20);
+		m_FontFamilyTextField.setBounds(2, 24, 193, 20);
 		m_FontSelectionPanel.add(m_FontFamilyTextField);
 		m_FontFamilyTextField.setColumns(10);
 		
 		m_FontFamilyScrollPane = new JScrollPane();
 		m_FontFamilyScrollPane.setBorder(null);
-		m_FontFamilyScrollPane.setBounds(6, 51, 165, 175);
+		m_FontFamilyScrollPane.setBounds(6, 51, 185, 175);
 		m_FontSelectionPanel.add(m_FontFamilyScrollPane);
 		
 		m_FontFamilyList = new JList<String>();
@@ -146,18 +148,18 @@ public class YAJFontChooser extends JDialog
 		m_FontFamilyScrollPane.setViewportView(m_FontFamilyList);
 		
 		m_FontStyleLabel = new JLabel("Style");
-		m_FontStyleLabel.setBounds(180, 6, 61, 16);
+		m_FontStyleLabel.setBounds(200, 6, 61, 16);
 		m_FontSelectionPanel.add(m_FontStyleLabel);
 		
 		m_FontStyleTextField = new JTextField();
 		m_FontStyleTextField.setEnabled(false);
 		m_FontStyleTextField.setEditable(false);
-		m_FontStyleTextField.setBounds(176, 24, 138, 20);
+		m_FontStyleTextField.setBounds(196, 24, 148, 20);
 		m_FontSelectionPanel.add(m_FontStyleTextField);
 		m_FontStyleTextField.setColumns(10);
 		
 		m_FontStyleScrollPane = new JScrollPane();
-		m_FontStyleScrollPane.setBounds(180, 51, 130, 175);
+		m_FontStyleScrollPane.setBounds(200, 51, 140, 175);
 		m_FontStyleScrollPane.setBorder(null);
 		m_FontSelectionPanel.add(m_FontStyleScrollPane);
 		
@@ -169,7 +171,7 @@ public class YAJFontChooser extends JDialog
 		
 		m_PreviewPanel = new JPanel();
 		m_PreviewPanel.setBorder(new TitledBorder(null, "Preview", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		m_PreviewPanel.setBounds(6, 235, 438, 98);
+		m_PreviewPanel.setBounds(6, 235, 488, 98);
 		m_FontSelectionPanel.add(m_PreviewPanel);
 		m_PreviewPanel.setLayout(new BorderLayout(0, 0));
 		
@@ -286,7 +288,28 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public String toString()
 		{
-			return m_Selection.getFamily();
+			String[] fontNameParts = m_Selection.getFontName().split("-");
+			if(fontNameParts.length == 2)
+			{
+				String[] parts = fontNameParts[1].split("(?<=\\p{Ll})(?=\\p{Lu})");
+				String fontText = "";
+				
+				for(int partIndex = 0; partIndex < parts.length; partIndex++)
+				{
+					fontText += parts[partIndex];
+					
+					if(partIndex < (parts.length - 1))
+					{
+						fontText +=" ";
+					}
+				}
+				
+				return fontText;
+			}
+			else
+			{
+				return "Regular";
+			}
 		}
 		
 		public Font getSelection()
