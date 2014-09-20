@@ -5,7 +5,8 @@ YAJFontChooser is an FontChooser for Java. With this font chooser it is possible
 
 Usage
 -----
-First copy the YAJFontChooser.java file into your project directory.
+* First copy the YAJFontChooser.java file into your project directory.
+
 ```java
 Font font = YAJFontChooser.showDialog();
 ```
