@@ -84,7 +84,8 @@ public class YAJFontChooser extends JDialog
 	private JTextField					m_FontSizeTextField		= null;
 	private JScrollPane					m_FontSizeScrollPane	= null;
 	private JList<Integer>				m_FontSizeList			= null;
-	private ButtonActionListener		m_ActionListener		= new ButtonActionListener();
+	private int							m_SelectedFontSize		= 10;
+	private ComponentActionListener		m_ActionListener		= new ComponentActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
 	
 	private static int[] 				DEFAULT_FONT_SIZES		= {5,6,7,8,9,10,11,12,13,14,18,24,36,48,64,72,96};
@@ -182,8 +183,9 @@ public class YAJFontChooser extends JDialog
 		
 		m_FontSizeTextField = new JTextField();
 		m_FontSizeTextField.setBounds(345, 24, 138, 20);
-		m_FontSelectionPanel.add(m_FontSizeTextField);
 		m_FontSizeTextField.setColumns(10);
+		m_FontSizeTextField.addActionListener(m_ActionListener);
+		m_FontSelectionPanel.add(m_FontSizeTextField);
 		
 		m_PreviewPanel = new JPanel();
 		m_PreviewPanel.setBorder(new TitledBorder(null, "Preview", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -197,6 +199,7 @@ public class YAJFontChooser extends JDialog
 		
 		m_FontSizeScrollPane = new JScrollPane();
 		m_FontSizeScrollPane.setBounds(349, 51, 130, 175);
+		m_FontSizeScrollPane.setBorder(null);
 		m_FontSelectionPanel.add(m_FontSizeScrollPane);
 		
 		m_FontSizeList = new JList<Integer>();
@@ -302,7 +305,8 @@ public class YAJFontChooser extends JDialog
 					m_FontStyleTextField.setCaretPosition(0);
 				
 					m_PreviewLabel.setText(styleSelection.toString());
-					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), 10);
+					
+					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
 					m_PreviewLabel.setFont(font);
 					
 					m_SelectedFont = font;
@@ -313,20 +317,24 @@ public class YAJFontChooser extends JDialog
 				FontStyleSelection styleSelection = m_FontStyleList.getSelectedValue();
 				if(styleSelection != null)
 				{
-					m_FontSizeTextField.setText(m_FontSizeList.getSelectedValue().toString());
-					m_FontSizeTextField.setCaretPosition(m_FontSizeTextField.getText().length());
-					
-					Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_FontSizeList.getSelectedValue().intValue());
-					
-					m_PreviewLabel.setFont(font);
-					
-					m_SelectedFont = font;
+					if(m_FontSizeList.getSelectedValue() != null)
+					{
+						m_FontSizeTextField.setText(m_FontSizeList.getSelectedValue().toString());
+						m_FontSizeTextField.setCaretPosition(m_FontSizeTextField.getText().length());
+						m_SelectedFontSize = m_FontSizeList.getSelectedValue().intValue();
+						
+						Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
+						
+						m_PreviewLabel.setFont(font);
+						
+						m_SelectedFont = font;
+					}
 				}
 			}
 		}
 	}
 	
-	private class ButtonActionListener implements ActionListener
+	private class ComponentActionListener implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent _Event)
@@ -339,6 +347,50 @@ public class YAJFontChooser extends JDialog
 			else if(_Event.getSource().equals(m_OkButton))
 			{
 				setVisible(false);
+			}
+			else if(_Event.getSource().equals(m_FontSizeTextField))
+			{
+				int fontSize = Integer.parseInt(m_FontSizeTextField.getText());
+				
+				if(fontSize <= 0)
+				{
+					fontSize = 1;
+				}
+				
+				if(fontSize >= 1)
+				{
+					int possibleSizeIndex = -1;
+					
+					for(int sizeIndex = 0; sizeIndex < DEFAULT_FONT_SIZES.length; sizeIndex++)
+					{
+						if(fontSize == DEFAULT_FONT_SIZES[sizeIndex])
+						{
+							possibleSizeIndex = sizeIndex;
+						}
+					}
+					
+					if(possibleSizeIndex > -1)
+					{
+						m_FontSizeList.setSelectedIndex(possibleSizeIndex);
+						m_FontSizeList.ensureIndexIsVisible(possibleSizeIndex);
+					}
+					else
+					{
+						m_FontSizeList.clearSelection();
+						
+						m_SelectedFontSize = fontSize;
+						
+						FontStyleSelection styleSelection = m_FontStyleList.getSelectedValue();
+						if(styleSelection != null)
+						{
+							Font font = new Font(styleSelection.getSelection().getFontName(), styleSelection.getSelection().getStyle(), m_SelectedFontSize);
+							
+							m_PreviewLabel.setFont(font);
+							
+							m_SelectedFont = font;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -353,29 +405,51 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public String toString()
 		{
+			//split font name as '-' character if existing
 			String[] fontNameParts = m_Selection.getFontName().split("-");
-			if(fontNameParts.length == 2)
+			String toSplit = "";
+			
+			//font name did not contains an '-' character, use first part for further usage
+			if(fontNameParts.length == 1)
 			{
-				//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
-				String[] parts = fontNameParts[1].split("(?<=\\p{Ll})(?=\\p{Lu})");
-				String fontText = "";
-				
-				for(int partIndex = 0; partIndex < parts.length; partIndex++)
-				{
-					fontText += parts[partIndex];
-					
-					if(partIndex < (parts.length - 1))
-					{
-						fontText +=" ";
-					}
-				}
-				
-				return fontText;
+				toSplit = fontNameParts[0];
 			}
-			else
+			//font name did contains an '-' char, used second part for further usage
+			else if(fontNameParts.length == 2)
+			{
+				toSplit = fontNameParts[1];
+			}
+
+			//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
+			String[] parts = toSplit.split("(?<=\\p{Ll})(?=\\p{Lu})");
+			String fontText = "";
+			
+			for(int partIndex = 0; partIndex < parts.length; partIndex++)
+			{
+				fontText += parts[partIndex];
+				
+				if(partIndex < (parts.length - 1))
+				{
+					fontText +=" ";
+				}
+			}
+			
+			//check if style name is equal to font family name
+			if(fontText.equals(m_Selection.getFamily()))
 			{
 				return "Regular";
 			}
+			
+			//replace possible occurrences of font family name
+			fontText = fontText.replace(m_Selection.getFamily(), "");
+			
+			//remove leading white space
+			if(fontText.charAt(0) == ' ')
+			{
+				fontText = fontText.substring(1);
+			}
+			
+			return fontText;
 		}
 		
 		public Font getSelection()
