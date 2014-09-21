@@ -23,6 +23,6 @@ Font font = YAJFontChooser.showDialog();
 Font preselectedFont = new Font("HelveticaNeue-UltraLight", Font.PLAIN, 10);
 Font selectedFont = YAJFontChooser.showDialog(preselectedFont);
 ```
-***See <code>Main.java</code> file for demo usage.***
+See <code>Main.java</code> file for demo usage.
 
 © 2014 Bjoern Poetzschke
