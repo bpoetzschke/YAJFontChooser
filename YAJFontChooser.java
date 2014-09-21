@@ -41,6 +41,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
@@ -86,7 +87,7 @@ public class YAJFontChooser extends JDialog
 	private JTextField					m_FontSizeTextField		= null;
 	private JScrollPane					m_FontSizeScrollPane	= null;
 	private JList<Integer>				m_FontSizeList			= null;
-	private int							m_SelectedFontSize		= 10;
+	private int							m_SelectedFontSize		= 12;
 	private ComponentActionListener		m_ActionListener		= new ComponentActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
 	private KeyHandler					m_KeyListener			= new KeyHandler();
@@ -105,10 +106,7 @@ public class YAJFontChooser extends JDialog
 		initFonts();
 		initFontSizeList();
 		
-		if(_PreselectedFont != null)
-		{
-			
-		}
+		preSelectFont(_PreselectedFont);
 	}
 	
 	private void initUI()
@@ -265,6 +263,63 @@ public class YAJFontChooser extends JDialog
 		
 		m_FontSizeList.setModel(sizeListModel);
 		m_FontSizeList.setSelectedIndex(7);
+	}
+	
+	private void preSelectFont(Font _PreselectedFont)
+	{
+		if(_PreselectedFont != null)
+		{
+			//select font family 
+			m_FontFamilyList.setSelectedValue(_PreselectedFont.getFamily(), true);
+			
+			//check if font family is realy selected
+			if(m_FontFamilyList.getSelectedValue().equals(_PreselectedFont.getFamily()))
+			{
+				ListModel<FontStyleSelection> fontStyleListModel = m_FontStyleList.getModel();
+				boolean styleFound = false;
+				
+				for(int fontStyleIndex = 0; fontStyleIndex < fontStyleListModel.getSize(); fontStyleIndex++)
+				{
+					FontStyleSelection fontStyle = fontStyleListModel.getElementAt(fontStyleIndex);
+					
+					if(fontStyle.getSelection().getFontName().equals(_PreselectedFont.getFontName()))
+					{
+						m_FontStyleList.setSelectedValue(fontStyle, true);
+						styleFound = true;
+						
+						break;
+					}
+				}
+				
+				if(!styleFound)
+				{
+					m_FontStyleList.setSelectedIndex(0);
+				}
+			}
+			
+			if(_PreselectedFont.getSize() >= 1)
+			{
+				m_SelectedFontSize = _PreselectedFont.getSize();
+			}
+			
+			m_FontSizeTextField.setText(Integer.toString(m_SelectedFontSize));
+			m_FontSizeTextField.setCaretPosition(m_FontSizeTextField.getText().length());
+			
+			m_FontSizeList.clearSelection();
+			
+			//search if font size is in list
+			for(int fontSizeIndex = 0; fontSizeIndex < DEFAULT_FONT_SIZES.length; fontSizeIndex++)
+			{
+				if(m_SelectedFontSize == DEFAULT_FONT_SIZES[fontSizeIndex])
+				{
+					m_FontSizeList.setSelectedIndex(fontSizeIndex);
+					m_FontSizeList.ensureIndexIsVisible(fontSizeIndex);
+					break;
+				}
+			}
+			
+			loadFont(_PreselectedFont.getFontName(), _PreselectedFont.getStyle(), m_SelectedFontSize);
+		}
 	}
 	
 	private void loadFontsForFamily(String _FontFamily)
