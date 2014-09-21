@@ -48,15 +48,50 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * Simple java font chooser which allows the user to select the font specific styles instead of the default
+ * values (Bold, Italic, Plain).
+ * To use the dialog just call YAJFontChooser.showDialog();
+ * If you want to have an font preselected just call the showDialog with the Font as parameters
+ * 
+ * @author Bjoern Poetzschke <bjoern.poetzschke@gmail.com>
+ *
+ */
 public class YAJFontChooser extends JDialog
 {
-	
+	/**
+	 * Shows the font chooser dialog. This function will wait until the user closes the dialog.
+	 * The dialog will return an instance of the selected color if the user clicks the "OK" button,
+	 * otherwise the dialog will return null. As default the first font is preselected.
+	 * @return
+	 * <ul>
+	 * 	<li>Font - The font which the user had selected</li>
+	 * 	<li>null - If the user cancels the dialog.
+	 * </ul>
+	 */
 	public static Font showDialog()
 	{
 		return showDialog(null);
 	}
 	
-	
+	/**
+	 * Shows the font chooser dialog and preselect the font which is given in the parameter.
+	 * If the font in the parameter is null the first font of the chooseable fonts is preselected.
+	 * This function will wait until the user closes the dialog.
+	 * The dialog will return an instance of the selected color if the user clicks the "OK" button,
+	 * otherwise the dialog will return null.
+	 * @param _PreselectedFont - The font which should be preselected.<br />
+	 * <strong>Note:</strong><br />
+	 * <ul>
+	 * 	<li>If the font is null the first font in the list will be preselected.</li>
+	 * 	<li>If the size of the given font is less or equal than zero the default font size of 12px will be used</li>
+	 * </ul>
+	 * @return
+	 * <ul>
+	 * 	<li>Font - The font which the user had selected</li>
+	 * 	<li>null - If the user cancels the dialog.
+	 * </ul>
+	 */
 	public static Font showDialog(Font _PreselectedFont)
 	{
 		YAJFontChooser fontChooser = new YAJFontChooser(_PreselectedFont);
@@ -64,6 +99,10 @@ public class YAJFontChooser extends JDialog
 		
 		return fontChooser.getSelectedFont();
 	}
+	
+	//-------------------------------
+	// Private Variables
+	//-------------------------------
 	
 	private static final long	serialVersionUID	= -3162469862533723830L;
 	
@@ -93,6 +132,11 @@ public class YAJFontChooser extends JDialog
 	private KeyHandler					m_KeyListener			= new KeyHandler();
 	
 	private static int[] 				DEFAULT_FONT_SIZES		= {5,6,7,8,9,10,11,12,13,14,18,24,36,48,64,72,96};
+	
+	//--------------------------------------------
+	// Private Methods
+	// No documentation here because it is private
+	//--------------------------------------------
 	
 	private YAJFontChooser(Font _PreselectedFont)
 	{
@@ -349,7 +393,7 @@ public class YAJFontChooser extends JDialog
 	}
 	
 	//----------------------------------------------------------------------------
-	// Internal classes
+	// Internal classes for event handling
 	//----------------------------------------------------------------------------
 	
 	private class SelectionListener implements ListSelectionListener
