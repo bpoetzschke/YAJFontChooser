@@ -10,11 +10,13 @@ First copy the YAJFontChooser.java file into your project directory.
 **Example**
 
 * Show the YAJFontChooser dialog with default method. The return value is an instance of the selected font or null if the user cancels the dialog with "ESC" key or "Cancel" button
+
 **Note** The first chooseable font in the list is selected with first chooseable style and an font size of 12px.
 ```java
 Font font = YAJFontChooser.showDialog();
 ```
 * Show the YAJFontChooser dialog with an preselected font. The return value is an instance of the font which the user had selected, if the user cancels with "ESC" key or "Cancel" button the return value will be <code>null</code>
+
 **Note** If the given font is <code>null</code> the first chosseable font in the list is selected with first chooseable style and font size of 12px. If the font size of the given font is less or equal than zero the default font size of 12px is used.
 ```java
 //create an instance of the font which should be preselected
