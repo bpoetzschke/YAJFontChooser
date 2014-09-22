@@ -504,6 +504,13 @@ public class YAJFontChooser extends JDialog
 		{
 			//split font name as '-' character if existing
 			String[] fontNameParts = m_Selection.getFontName().split("-");
+			
+			//clean up possible mt and ms chars
+			for(int partIndex = 0; partIndex < fontNameParts.length; partIndex++)
+			{
+				fontNameParts[partIndex] = cleanupFontString(fontNameParts[partIndex]);
+			}
+			
 			String toSplit = "";
 			
 			//font name did not contains an '-' character, use first part for further usage
@@ -516,10 +523,13 @@ public class YAJFontChooser extends JDialog
 			{
 				toSplit = fontNameParts[1];
 			}
+			else if(fontNameParts.length >= 3)
+			{
+				return fontNameParts[fontNameParts.length - 1];
+			}
 			
 			//remove MT from font style name
 			toSplit = cleanupFontString(toSplit);
-			
 			
 			//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
 			String[] parts = toSplit.split("(?<=\\p{Ll})(?=\\p{Lu})");
@@ -542,9 +552,7 @@ public class YAJFontChooser extends JDialog
 			}
 			
 			//replace possible occurrences of font family name
-			String fontFamily = m_Selection.getFamily().replace("MT", "");
-			fontFamily = fontFamily.replace("MS", "");
-			fontFamily = fontFamily.replace("  ", " ");
+			String fontFamily = cleanupFontString(m_Selection.getFamily());
 			
 			if(fontFamily.charAt(fontFamily.length() - 1) == ' ')
 			{
@@ -564,7 +572,13 @@ public class YAJFontChooser extends JDialog
 				fontText = fontText.substring(1);
 			}
 			
-			if(fontText.equals(fontFamily))
+			/*if(fontText.equals(fontFamily))
+			{
+				return "Regular";
+			}*/
+			
+			//font name is part of family name return default value
+			if(m_FontFamilyList.getSelectedValue().toString().contains(fontText))
 			{
 				return "Regular";
 			}
