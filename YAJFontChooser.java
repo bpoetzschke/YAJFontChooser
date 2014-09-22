@@ -108,7 +108,7 @@ public class YAJFontChooser extends JDialog
 	private JLabel						m_FontLabel				= null;
 	private JTextField					m_FontFamilyTextField	= null;
 	private JScrollPane					m_FontFamilyScrollPane	= null;
-	private JList<String>				m_FontFamilyList		= null;
+	private JList<FontFamilyModel>		m_FontFamilyList		= null;
 	private HashMap<String, List<Font>>	m_FontMap				= null;
 	private JLabel						m_FontStyleLabel		= null;
 	private JTextField					m_FontStyleTextField	= null;
@@ -192,7 +192,7 @@ public class YAJFontChooser extends JDialog
 		m_FontFamilyScrollPane.setBounds(6, 51, 185, 175);
 		m_FontSelectionPanel.add(m_FontFamilyScrollPane);
 		
-		m_FontFamilyList = new JList<String>();
+		m_FontFamilyList = new JList<FontFamilyModel>();
 		m_FontFamilyList.setBorder(null);
 		m_FontFamilyList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		m_FontFamilyList.addListSelectionListener(m_SelectionListener);
@@ -279,10 +279,10 @@ public class YAJFontChooser extends JDialog
 		
 		String[] fontFamilyNames = graphicsEnvironment.getAvailableFontFamilyNames();
 		
-		DefaultListModel<String> fontFamilyListModel = new DefaultListModel<String>();
+		DefaultListModel<FontFamilyModel> fontFamilyListModel = new DefaultListModel<FontFamilyModel>();
 		for(String fontFamily : fontFamilyNames)
 		{
-			fontFamilyListModel.addElement(fontFamily);
+			fontFamilyListModel.addElement(new FontFamilyModel(fontFamily));
 		}
 		
 		m_FontFamilyList.setModel(fontFamilyListModel);
@@ -397,10 +397,10 @@ public class YAJFontChooser extends JDialog
 		{
 			if(_Event.getSource().equals(m_FontFamilyList))
 			{
-				m_FontFamilyTextField.setText(m_FontFamilyList.getSelectedValue());
+				m_FontFamilyTextField.setText(m_FontFamilyList.getSelectedValue().toString());
 				m_FontFamilyTextField.setCaretPosition(0);
 				
-				loadFontsForFamily(m_FontFamilyTextField.getText());
+				loadFontsForFamily(m_FontFamilyList.getSelectedValue().getFontFamily());
 			}
 			else if(_Event.getSource().equals(m_FontStyleList))
 			{
@@ -518,7 +518,8 @@ public class YAJFontChooser extends JDialog
 			}
 			
 			//remove MT from font style name
-			toSplit = toSplit.replace("MT", "");
+			toSplit = cleanupFontString(toSplit);
+			
 			
 			//see http://stackoverflow.com/a/17512351 for splitting string at uppercase
 			String[] parts = toSplit.split("(?<=\\p{Ll})(?=\\p{Lu})");
@@ -541,12 +542,31 @@ public class YAJFontChooser extends JDialog
 			}
 			
 			//replace possible occurrences of font family name
-			fontText = fontText.replace(m_Selection.getFamily(), "");
+			String fontFamily = m_Selection.getFamily().replace("MT", "");
+			fontFamily = fontFamily.replace("MS", "");
+			fontFamily = fontFamily.replace("  ", " ");
+			
+			if(fontFamily.charAt(fontFamily.length() - 1) == ' ')
+			{
+				fontFamily = fontFamily.substring(0, fontFamily.length() - 1);
+			}
+			
+			fontText = fontText.replace(fontFamily, "");
+			
+			if(fontText.equals(""))
+			{
+				return "Regular";
+			}
 			
 			//remove leading white space
 			if(fontText.charAt(0) == ' ')
 			{
 				fontText = fontText.substring(1);
+			}
+			
+			if(fontText.equals(fontFamily))
+			{
+				return "Regular";
 			}
 			
 			return fontText;
@@ -575,13 +595,19 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public String toString()
 		{
-			String retValue = m_FontFamily.replace("MT", "");
-			retValue = retValue.replace("  ", "");
-			
-			return retValue;
+			return cleanupFontString(m_FontFamily);
 		}
 		
 		private String m_FontFamily = "";
+	}
+	
+	private String cleanupFontString(String _FontString)
+	{
+		_FontString = _FontString.replace("MT", "");
+		_FontString = _FontString.replace("MS", "");
+		_FontString = _FontString.replace("  ", " ");
+		
+		return _FontString;
 	}
 	
 	private class KeyHandler implements KeyListener
