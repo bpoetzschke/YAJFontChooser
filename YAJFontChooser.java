@@ -578,10 +578,18 @@ public class YAJFontChooser extends JDialog
 			}*/
 			
 			//font name is part of family name return default value
-			if(m_FontFamilyList.getSelectedValue().toString().contains(fontText))
+			String cleanedFamily = m_FontFamilyList.getSelectedValue().toString().replace(" ","");
+			cleanedFamily = cleanedFamily.replace("LET", "Let");
+			
+			//check if font family contains the whole font name part, if yes return "Regular"
+			if( cleanedFamily.contains(fontText)
+				|| m_FontFamilyList.getSelectedValue().toString().contains(fontText)
+				|| m_FontFamilyList.getSelectedValue().toString().contains(fontText.replaceAll(" ","")))
 			{
 				return "Regular";
 			}
+			
+			fontText = fontText.replace(m_FontFamilyList.getSelectedValue().toString().replaceAll("LET", "Let"), "");
 			
 			return fontText;
 		}
