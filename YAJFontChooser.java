@@ -560,6 +560,30 @@ public class YAJFontChooser extends JDialog
 		private Font m_Selection = null;
 	}
 	
+	private class FontFamilyModel
+	{
+		public FontFamilyModel(String _FontFamily)
+		{
+			m_FontFamily = _FontFamily;
+		}
+		
+		public String getFontFamily()
+		{
+			return m_FontFamily;
+		}
+		
+		@Override
+		public String toString()
+		{
+			String retValue = m_FontFamily.replace("MT", "");
+			retValue = retValue.replace("  ", "");
+			
+			return retValue;
+		}
+		
+		private String m_FontFamily = "";
+	}
+	
 	private class KeyHandler implements KeyListener
 	{
 		@Override
