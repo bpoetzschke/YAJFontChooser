@@ -617,7 +617,19 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public String toString()
 		{
-			return cleanupFontString(m_FontFamily);
+			String retVal = cleanupFontString(m_FontFamily);
+			
+			if(retVal.charAt(0) == ' ')
+			{
+				retVal = retVal.substring(1);
+			}
+			
+			if(retVal.equals("Gothic"))
+			{
+				System.out.println(m_FontFamily);
+			}
+			
+			return retVal;
 		}
 		
 		private String m_FontFamily = "";
@@ -625,9 +637,9 @@ public class YAJFontChooser extends JDialog
 	
 	private String cleanupFontString(String _FontString)
 	{
-		_FontString = _FontString.replace("MT", "");
-		_FontString = _FontString.replace("MS", "");
-		_FontString = _FontString.replace("  ", " ");
+		_FontString = _FontString.replaceAll("MT", "" );
+		_FontString = _FontString.replaceAll("  ", " ");
+		_FontString = _FontString.replaceAll("_" , " ");
 		
 		return _FontString;
 	}
