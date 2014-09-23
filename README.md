@@ -23,10 +23,14 @@ Font font = YAJFontChooser.showDialog();
 Font preselectedFont = new Font("HelveticaNeue-UltraLight", Font.PLAIN, 10);
 Font selectedFont = YAJFontChooser.showDialog(preselectedFont);
 ```
+---
+See <code>Main.java</code> file for demo usage.
 
 Please Note:
 ------------
 If Asian fonts are installed on the computer, there may be problems displaying the font family and font style during cryptic names.
+
+During some problems in Java SDK some fonts are not rendered correctly in the sample field.
 
 ---
 
@@ -36,7 +40,7 @@ Screenshots:
 
 ![YAJFontChooser on Windows](http://www.bpdev.net/YAJFontChooser_win.png)
 
-See <code>Main.java</code> file for demo usage.
+---
 
 If you find an bug please report them using the github Issue tool at following [link](https://github.com/kaenplan/YAJFontChooser/issues)
 
