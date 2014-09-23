@@ -553,6 +553,11 @@ public class YAJFontChooser extends JDialog
 			
 			//replace possible occurrences of font family name
 			String fontFamily = cleanupFontString(m_Selection.getFamily());
+
+			fontFamily = fontFamily.replace("Lt", "Light");
+			fontFamily = fontFamily.replace("Cn", "Condensed");
+			fontFamily = fontFamily.replace("Bk", "Black");
+			fontFamily = fontFamily.replace("Th", "Thin");
 			
 			if(fontFamily.charAt(fontFamily.length() - 1) == ' ')
 			{
@@ -562,6 +567,29 @@ public class YAJFontChooser extends JDialog
 			fontText = fontText.replace(fontFamily, "");
 			
 			if(fontText.equals(""))
+			{
+				return "Regular";
+			}
+			
+			//split up font family if possible
+			String familyParts[] = m_FontFamilyList.getSelectedValue().getFontFamily().split("(?<=\\p{Ll})(?=\\p{Lu})");
+			if(familyParts.length >= 1)
+			{
+				String family = "";
+				for(int index = 0; index < familyParts.length; index++)
+				{
+					family += familyParts[index];
+					
+					if(index < familyParts.length - 1)
+					{
+						family += " ";
+					}
+				}
+				
+				fontText = fontText.replace(family, "");
+			}
+			
+			if(fontText.length() == 0)
 			{
 				return "Regular";
 			}
@@ -617,7 +645,9 @@ public class YAJFontChooser extends JDialog
 		@Override
 		public String toString()
 		{
-			String retVal = cleanupFontString(m_FontFamily);
+			String retVal = m_FontFamily;
+			retVal = retVal.replaceAll("_", " ");
+			retVal = retVal.replaceAll("  ", " ");
 			
 			if(retVal.charAt(0) == ' ')
 			{
