@@ -40,6 +40,10 @@ Screenshots:
 
 ![YAJFontChooser on Windows](http://www.bpdev.net/YAJFontChooser_win.png)
 
+**Mac OSX**
+
+![YAJFontChooser on Mac OSX](http://www.bpdev.net/YAJFontChooser_mac.png)
+
 ---
 
 If you find an bug please report them using the github Issue tool at following [link](https://github.com/kaenplan/YAJFontChooser/issues)
