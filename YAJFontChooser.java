@@ -123,7 +123,6 @@ public class YAJFontChooser extends JDialog
 	private int							m_SelectedFontSize		= 12;
 	private ComponentActionListener		m_ActionListener		= new ComponentActionListener();
 	private SelectionListener			m_SelectionListener		= new SelectionListener();
-	private KeyHandler					m_KeyListener			= new KeyHandler();
 	
 	private static int[] 				DEFAULT_FONT_SIZES		= {5,6,7,8,9,10,11,12,13,14,18,24,36,48,64,72,96};
 	
@@ -155,10 +154,6 @@ public class YAJFontChooser extends JDialog
 		setLocationRelativeTo(null);
 		
 		setTitle("Select Font");
-		
-		//setFocusable required to be set to true to repsond to key listener
-		setFocusable(true);
-		addKeyListener(m_KeyListener);
 		
 		m_ButtonPanel = new JPanel();
 		getContentPane().add(m_ButtonPanel, BorderLayout.SOUTH);
@@ -308,7 +303,6 @@ public class YAJFontChooser extends JDialog
 		if(_PreselectedFont != null)
 		{
 			//select font family 
-			//m_FontFamilyList.setSelectedValue(_PreselectedFont.getFamily(), true);
 			ListModel<FontFamilyModel> listModel = m_FontFamilyList.getModel();
 			
 			for(int familyIndex = 0; familyIndex < listModel.getSize(); familyIndex++)
@@ -515,7 +509,7 @@ public class YAJFontChooser extends JDialog
 			//split font name as '-' character if existing
 			String[] fontNameParts = m_Selection.getFontName().split("-");
 			
-			//clean up possible mt and ms chars
+			//clean up possible mt and ms chars in font style name
 			for(int partIndex = 0; partIndex < fontNameParts.length; partIndex++)
 			{
 				fontNameParts[partIndex] = cleanupFontString(fontNameParts[partIndex]);
@@ -564,10 +558,11 @@ public class YAJFontChooser extends JDialog
 			//replace possible occurrences of font family name
 			String fontFamily = cleanupFontString(m_Selection.getFamily());
 
-			fontFamily = fontFamily.replace("Lt", "Light");
-			fontFamily = fontFamily.replace("Cn", "Condensed");
-			fontFamily = fontFamily.replace("Bk", "Black");
-			fontFamily = fontFamily.replace("Th", "Thin");
+			//replace short names for font styles
+			fontFamily = fontFamily.replaceAll("Lt"  , "Light"	  );
+			fontFamily = fontFamily.replaceAll("Cn"  , "Condensed");
+			fontFamily = fontFamily.replaceAll("Bk"  , "Black"	  );
+			fontFamily = fontFamily.replaceAll("Th"  , "Thin" 	  );
 			
 			if(fontFamily.charAt(fontFamily.length() - 1) == ' ')
 			{
@@ -629,6 +624,12 @@ public class YAJFontChooser extends JDialog
 				fontText = fontText.substring(1);
 			}
 			
+			//replace short styles in font
+			fontText = fontText.replaceAll("\\bCond\\b", "Condensed");
+			fontText = fontText.replaceAll("\\bExt\\b" , "Extended" );
+			fontText = fontText.replaceAll("\\bObl\\b" , "Oblique"  );
+			fontText = fontText.replaceAll("\\bBd\\b"  , "Bold"		);
+			
 			return fontText;
 		}
 		
@@ -671,11 +672,6 @@ public class YAJFontChooser extends JDialog
 				retVal = retVal.substring(1);
 			}
 			
-			if(retVal.equals("Gothic"))
-			{
-				System.out.println(m_FontFamily);
-			}
-			
 			return retVal;
 		}
 		
@@ -685,33 +681,10 @@ public class YAJFontChooser extends JDialog
 	private String cleanupFontString(String _FontString)
 	{
 		_FontString = _FontString.replaceAll("MT", "" );
+		_FontString = _FontString.replaceAll("PS", "");
 		_FontString = _FontString.replaceAll("  ", " ");
 		_FontString = _FontString.replaceAll("_" , " ");
 		
 		return _FontString;
-	}
-	
-	private class KeyHandler implements KeyListener
-	{
-		@Override
-		public void keyTyped(KeyEvent _Event)
-		{	
-		}
-
-		@Override
-		public void keyPressed(KeyEvent _Event)
-		{
-			if(_Event.getKeyCode() == KeyEvent.VK_ESCAPE)
-			{
-				m_SelectedFont = null;
-				setVisible(false);
-			}
-		}
-
-		@Override
-		public void keyReleased(KeyEvent _Event)
-		{
-		}
-		
 	}
 }
