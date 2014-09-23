@@ -32,7 +32,8 @@ If Asian fonts are installed on the computer, there may be problems displaying t
 
 Screenshots:
 -----------
-*Windows*
+**Windows**
+
 ![YAJFontChooser on Windows](http://www.bpdev.net/YAJFontChooser_win.png)
 
 See <code>Main.java</code> file for demo usage.
