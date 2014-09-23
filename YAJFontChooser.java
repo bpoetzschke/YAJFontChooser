@@ -507,10 +507,10 @@ public class YAJFontChooser extends JDialog
 		public FontStyleSelection(Font _Font)
 		{
 			m_Selection = _Font;
+			m_FontText  = parseFontStyle();
 		}
 		
-		@Override
-		public String toString()
+		public String parseFontStyle()
 		{
 			//split font name as '-' character if existing
 			String[] fontNameParts = m_Selection.getFontName().split("-");
@@ -604,12 +604,6 @@ public class YAJFontChooser extends JDialog
 				return "Regular";
 			}
 			
-			//remove leading white space
-			if(fontText.charAt(0) == ' ')
-			{
-				fontText = fontText.substring(1);
-			}
-			
 			/*if(fontText.equals(fontFamily))
 			{
 				return "Regular";
@@ -629,7 +623,19 @@ public class YAJFontChooser extends JDialog
 			
 			fontText = fontText.replace(m_FontFamilyList.getSelectedValue().toString().replaceAll("LET", "Let"), "");
 			
+			//remove leading white space
+			if(fontText.charAt(0) == ' ')
+			{
+				fontText = fontText.substring(1);
+			}
+			
 			return fontText;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return m_FontText;
 		}
 		
 		public Font getSelection()
@@ -637,7 +643,8 @@ public class YAJFontChooser extends JDialog
 			return m_Selection;
 		}
 		
-		private Font m_Selection = null;
+		private Font	m_Selection = null;
+		private String	m_FontText  = "";
 	}
 	
 	private class FontFamilyModel
