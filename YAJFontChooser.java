@@ -308,10 +308,20 @@ public class YAJFontChooser extends JDialog
 		if(_PreselectedFont != null)
 		{
 			//select font family 
-			m_FontFamilyList.setSelectedValue(_PreselectedFont.getFamily(), true);
+			//m_FontFamilyList.setSelectedValue(_PreselectedFont.getFamily(), true);
+			ListModel<FontFamilyModel> listModel = m_FontFamilyList.getModel();
+			
+			for(int familyIndex = 0; familyIndex < listModel.getSize(); familyIndex++)
+			{
+				if(listModel.getElementAt(familyIndex).getFontFamily().equals(_PreselectedFont.getFamily()))
+				{
+					m_FontFamilyList.setSelectedValue(listModel.getElementAt(familyIndex), true);
+					break;
+				}
+			}
 			
 			//check if font family is realy selected
-			if(m_FontFamilyList.getSelectedValue().equals(_PreselectedFont.getFamily()))
+			if(m_FontFamilyList.getSelectedValue().getFontFamily().equals(_PreselectedFont.getFamily()))
 			{
 				ListModel<FontStyleSelection> fontStyleListModel = m_FontStyleList.getModel();
 				boolean styleFound = false;
